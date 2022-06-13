@@ -45,7 +45,7 @@ function create_wp_sls_dir()
 /**
  * Create Search Feed
  */
-add_action('publish_post', 'create_search_feed');
+add_action('publish_page', 'create_search_feed');
 function create_search_feed()
 {
 
@@ -54,7 +54,7 @@ function create_search_feed()
   ob_start();
 
   $wpExportOptions = array(
-    'content'    => 'post',
+    'content'    => 'all',
     'status'     => 'publish',
   );
 
