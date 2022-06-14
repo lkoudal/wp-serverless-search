@@ -68,7 +68,7 @@ function create_search_feed()
 
   export_wp($wpExportOptions1);
   // hack to append second export
-  //export_wp($wpExportOptions2);
+  export_wp($wpExportOptions2);
 
   $xml = ob_get_clean();
 
