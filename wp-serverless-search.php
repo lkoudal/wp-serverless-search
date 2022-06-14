@@ -58,7 +58,7 @@ function create_search_feed()
   ob_start();
 
   $wpExportOptions = array(
-    'content'    => 'all',
+    'content'    => 'page',
     'status'     => 'publish',
   );
   
@@ -72,7 +72,7 @@ function create_search_feed()
   
   
   
-  $filtered_xml = $parsed_xml->xpath("/rss/channel/item");
+  $filtered_xml = $parsed_xml->xpath("/rss");
 
   $upload_dir = wp_get_upload_dir();
   $save_path = $upload_dir['basedir'] . '/wp-sls/search-feed.xml';
