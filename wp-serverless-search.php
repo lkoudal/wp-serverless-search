@@ -4,8 +4,8 @@
  * Plugin Name: WP Serverless Search
  * Plugin URI: https://github.com/emaildano/wp-serverless-search
  * Description: A static search plugin for WordPress.
- * Version: 0.0.1
- * Author: DigitalCube, Daniel Olson
+ * Version: 0.2
+ * Author: DigitalCube - Daniel Olson, @Erudition
  * Author URI: https://digitalcube.jp
  * License: GPL2
  * Text Domain: wp-serverless-search
@@ -45,8 +45,10 @@ function create_wp_sls_dir()
 /**
  * Create Search Feed
  */
-add_action('publish_page', 'create_search_feed');
-add_action('publish_post', 'create_search_feed');
+
+add_action('transition_post_status', 'create_search_feed');
+// transition_post_status is better because it applies to edits and not just new posts
+
 function create_search_feed()
 {
 
@@ -58,8 +60,15 @@ function create_search_feed()
     'content'    => 'page',
     'status'     => 'publish',
   );
+  
+  $wpExportOptions2 = array(
+    'content'    => 'post',
+    'status'     => 'publish',
+  );
 
   export_wp($wpExportOptions1);
+  // hack to append second export
+  export_wp($wpExportOptions2);
 
   $xmlPages = ob_get_clean();
 
@@ -69,22 +78,8 @@ function create_search_feed()
   
   file_put_contents($save_path, $xmlPages);
   
-  /**
- * Round 2 - add posts - hack by Erudition
- */
-  ob_start();
 
-  $wpExportOptions2 = array(
-    'content'    => 'post',
-    'status'     => 'publish',
-  );
 
-  export_wp($wpExportOptions2);
-
-  $xmlPosts = ob_get_clean();
-  
-  
-  file_put_contents($save_path, $xmlPosts, FILE_APPEND);
 }
 
 /**
