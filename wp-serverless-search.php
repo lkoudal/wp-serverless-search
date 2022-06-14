@@ -58,7 +58,7 @@ function create_search_feed()
   ob_start();
 
   $wpExportOptions1 = array(
-    'content'    => 'page',
+    'content'    => 'page,post',
     'status'     => 'publish',
   );
   
@@ -68,7 +68,7 @@ function create_search_feed()
   );
 
   export_wp($wpExportOptions1);
-  // hack to append second export
+  // hack to append second export - fails because export_wp() crashes when run twice (redefined functions error)
   // export_wp($wpExportOptions2);
 
   $xml = ob_get_clean();
