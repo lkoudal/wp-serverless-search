@@ -61,10 +61,10 @@ function create_search_feed()
     'status'     => 'publish',
   );
   
-  $wpExportOptions2 = array(
-    'content'    => 'post',
-    'status'     => 'publish',
-  );
+ // $wpExportOptions2 = array(
+ //   'content'    => 'post',
+ //   'status'     => 'publish',
+ // );
 
   export_wp($wpExportOptions1);
   // hack to append second export
