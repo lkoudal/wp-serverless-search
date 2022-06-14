@@ -52,7 +52,7 @@ add_action('transition_post_status', 'create_search_feed');
 function create_search_feed()
 {
 
-  require_once(ABSPATH . 'wp-admin/includes/export.php');
+  //require_once(ABSPATH . 'wp-admin/includes/export.php');
 
   ob_start();
 
