@@ -58,7 +58,7 @@ function create_search_feed()
   ob_start();
 
   $wpExportOptions1 = array(
-    'content'    => 'page,post',
+    'content'    => 'page',
     'status'     => 'publish',
   );
   
