@@ -57,27 +57,26 @@ function create_search_feed()
 
   ob_start();
 
-  $wpExportOptions1 = array(
-    'content'    => 'page',
+  $wpExportOptions = array(
+    'content'    => 'all',
     'status'     => 'publish',
   );
   
-  $wpExportOptions2 = array(
-    'content'    => 'post',
-    'status'     => 'publish',
-  );
 
-  export_wp($wpExportOptions1);
-  // hack to append second export - fails because export_wp() crashes when run twice (redefined functions error)
-  // export_wp($wpExportOptions2);
+  export_wp($wpExportOptions);
+  
 
-  $xml = ob_get_clean();
+  $raw_xml = ob_get_clean();
+  
+  $parsed_xml = new SimpleXMLElement($raw_xml);
+  
+  $filtered_xml = $xml->xpath("/rss/channel/item");
 
   $upload_dir = wp_get_upload_dir();
   $save_path = $upload_dir['basedir'] . '/wp-sls/search-feed.xml';
 
   
-  file_put_contents($save_path, $xml);
+  file_put_contents($save_path, $filtered_xml);
   
 
 
