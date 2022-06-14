@@ -72,7 +72,7 @@ function create_search_feed()
   
   
   
-  $filtered_xml = $xml->xpath("/rss/channel/item");
+  $filtered_xml = $parsed_xml->xpath("/rss/channel/item");
 
   $upload_dir = wp_get_upload_dir();
   $save_path = $upload_dir['basedir'] . '/wp-sls/search-feed.xml';
