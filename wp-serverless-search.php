@@ -52,7 +52,7 @@ add_action('transition_post_status', 'create_search_feed');
 function create_search_feed()
 {
 
-  //require_once(ABSPATH . 'wp-admin/includes/export.php');
+  require_once(ABSPATH . 'wp-admin/includes/export.php');
 
   ob_start();
 
@@ -68,15 +68,15 @@ function create_search_feed()
 
   export_wp($wpExportOptions1);
   // hack to append second export
-  export_wp($wpExportOptions2);
+  //export_wp($wpExportOptions2);
 
-  $xmlPages = ob_get_clean();
+  $xml = ob_get_clean();
 
   $upload_dir = wp_get_upload_dir();
   $save_path = $upload_dir['basedir'] . '/wp-sls/search-feed.xml';
 
   
-  file_put_contents($save_path, $xmlPages);
+  file_put_contents($save_path, $xml);
   
 
 
