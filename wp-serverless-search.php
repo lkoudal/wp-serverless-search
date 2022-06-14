@@ -46,7 +46,7 @@ function create_wp_sls_dir()
  * Create Search Feed
  */
 
-add_action('publish_post', 'create_search_feed');
+add_action('publish_page', 'create_search_feed');
 // transition_post_status is better because it applies to edits and not just new posts
 
 function create_search_feed()
@@ -61,10 +61,10 @@ function create_search_feed()
     'status'     => 'publish',
   );
   
- // $wpExportOptions2 = array(
- //   'content'    => 'post',
- //   'status'     => 'publish',
- // );
+  $wpExportOptions2 = array(
+    'content'    => 'post',
+    'status'     => 'publish',
+  );
 
   export_wp($wpExportOptions1);
   // hack to append second export
