@@ -54,19 +54,37 @@ function create_search_feed()
 
   ob_start();
 
-  $wpExportOptions = array(
-    'content'    => 'all',
+  $wpExportOptions1 = array(
+    'content'    => 'page',
     'status'     => 'publish',
   );
 
-  export_wp($wpExportOptions);
+  export_wp($wpExportOptions1);
 
-  $xml = ob_get_clean();
+  $xmlPages = ob_get_clean();
 
   $upload_dir = wp_get_upload_dir();
   $save_path = $upload_dir['basedir'] . '/wp-sls/search-feed.xml';
 
-  file_put_contents($save_path, $xml);
+  
+  file_put_contents($save_path, $xmlPages);
+  
+  /**
+ * Round 2 - add posts - hack by Erudition
+ */
+  ob_start();
+
+  $wpExportOptions2 = array(
+    'content'    => 'post',
+    'status'     => 'publish',
+  );
+
+  export_wp($wpExportOptions2);
+
+  $xmlPosts = ob_get_clean();
+  
+  
+  file_put_contents($save_path, $xmlPosts, FILE_APPEND);
 }
 
 /**
