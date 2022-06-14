@@ -68,7 +68,9 @@ function create_search_feed()
 
   $raw_xml = ob_get_clean();
   
-  $parsed_xml = new SimpleXMLElement($raw_xml);
+  $parsed_xml = simplexml_load_string($raw_xml);
+  
+  
   
   $filtered_xml = $xml->xpath("/rss/channel/item");
 
