@@ -68,7 +68,7 @@ function create_search_feed()
 
   $raw_xml = ob_get_clean();
   
-  $parsed_xml = simplexml_load_string($raw_xml);
+  $parsed_xml = new SimpleXMLElement($raw_xml);
   
   
   
