@@ -46,7 +46,7 @@ function create_wp_sls_dir()
  * Create Search Feed
  */
 
-add_action('transition_post_status', 'create_search_feed');
+add_action('publish_post', 'create_search_feed');
 // transition_post_status is better because it applies to edits and not just new posts
 
 function create_search_feed()
