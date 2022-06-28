@@ -45,8 +45,8 @@ function create_wp_sls_dir()
 /**
  * Create Search Feed
  */
-
-add_action('publish_page', 'create_search_feed');
+add_action('after_setup_theme', 'create_search_feed');
+//add_action('publish_page', 'create_search_feed');
 //add_action('publish_post', 'create_search_feed');
 
 
