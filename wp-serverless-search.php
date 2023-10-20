@@ -48,9 +48,10 @@ function create_wp_sls_dir()
 //add_action('wp_loaded', 'create_search_feed');
 //add_action('publish_page', 'create_search_feed');
 add_action('publish_post', 'create_search_feed');
+add_action('transition_post_status', 'create_search_feed');
 
 
-function create_search_feed()
+function create_search_feed($newstatus, $oldstatus, $post)
 {
 
   require_once(ABSPATH . 'wp-admin/includes/export.php');
