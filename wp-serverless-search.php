@@ -82,8 +82,16 @@ function create_search_feed()
   
   file_put_contents($save_path, $filtered_xml_string);
   
+  add_action( 'admin_notices', 'sample_admin_notice__success' );
 
+}
 
+function sample_admin_notice__success() {
+    ?>
+    <div class="notice notice-success is-dismissible">
+        <p><?php _e( 'Search index updated!', 'sample-text-domain' ); ?></p>
+    </div>
+    <?php
 }
 
 /**
