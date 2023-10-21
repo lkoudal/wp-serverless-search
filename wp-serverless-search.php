@@ -57,8 +57,14 @@ function create_search_feed()
 
   ob_start();
 
+  if (!get_option('wp_sls_search_post_type')) {
+    $index_type = 'post';
+  } else {
+    $index_type = get_option('wp_sls_search_post_type');
+  }
+
   $wpExportOptions = array(
-    'content'    => get_option('wp_sls_search_post_type'),
+    'content'    => $index_type,
     'status'     => 'publish',
   );
   
