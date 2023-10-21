@@ -79,12 +79,12 @@ function create_search_feed()
   //$filtered_xml_string = $filtered_xml_object[0]->asXML();
 
   $upload_dir = wp_get_upload_dir();
-  $save_path = $upload_dir['basedir'] . '/wp-sls/search-feed.xml';
-  //$raw_path = $upload_dir['basedir'] . '/wp-sls/export.xml';
+  //$save_path = $upload_dir['basedir'] . '/wp-sls/search-feed.xml';
+  $raw_path = $upload_dir['basedir'] . '/wp-sls/export.xml';
 
   
-  file_put_contents($save_path, $raw_xml);
-  //file_put_contents($raw_path, $raw_xml);
+  //file_put_contents($save_path, $raw_xml);
+  file_put_contents($raw_path, $raw_xml);
 
 }
 
