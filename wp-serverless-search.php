@@ -84,21 +84,15 @@ function create_search_feed()
 
   $upload_dir = wp_get_upload_dir();
   $save_path = $upload_dir['basedir'] . '/wp-sls/search-feed.xml';
+  $raw_path = $upload_dir['basedir'] . '/wp-sls/export.xml';
 
   
   file_put_contents($save_path, $filtered_xml_string);
-  
-  add_action( 'admin_notices', 'sample_admin_notice__success' );
+  file_put_contents($raw_path, $raw_xml);
 
 }
 
-function sample_admin_notice__success() {
-    ?>
-    <div class="notice notice-success is-dismissible">
-        <p><?php _e( 'Search index updated!', 'sample-text-domain' ); ?></p>
-    </div>
-    <?php
-}
+
 
 /**
  * Set Plugin Defaults
