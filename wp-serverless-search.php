@@ -52,7 +52,7 @@ add_action('transition_post_status', 'react', 100, 3);
 
 function react($unused1, $unused2, $unused3)
 {
-  create_search_feed()
+  create_search_feed();
 }
 
 function create_search_feed()
