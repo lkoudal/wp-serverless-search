@@ -5,7 +5,7 @@
 
 
 var wpServerlessSearch = (function () {
-  const searchFeed = location.origin + '/wp-content/uploads/wp-sls/search-feed.xml';
+  const searchFeed = searchParams.uploadDir + '/wp-sls/search-feed.xml';
   const urlParams = window.location.search;
   const searchModalSelector = 'wp-sls-search-modal';
   const searchModalInput = '.wp-sls-search-field';
