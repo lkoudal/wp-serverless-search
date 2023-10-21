@@ -103,6 +103,7 @@ function wp_sls_search_default_options()
   $options = array(
     'wp_sls_search_form' => '[role=search]',
     'wp_sls_search_form_input' => 'input[type=search]',
+    'wp_sls_search_post_type' => 'post'
   );
 
   foreach ($options as $key => $value) {
