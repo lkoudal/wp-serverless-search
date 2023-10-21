@@ -74,21 +74,17 @@ function create_search_feed()
 
   $raw_xml = ob_get_clean();
   
-  $parsed_xml = new SimpleXMLElement($raw_xml);
-  
-  
-  
-  $filtered_xml_object = $parsed_xml->xpath("/rss");
-  
-  $filtered_xml_string = $filtered_xml_object[0]->asXML();
+  //$parsed_xml = new SimpleXMLElement($raw_xml);
+  //$filtered_xml_object = $parsed_xml->xpath("/rss");
+  //$filtered_xml_string = $filtered_xml_object[0]->asXML();
 
   $upload_dir = wp_get_upload_dir();
   $save_path = $upload_dir['basedir'] . '/wp-sls/search-feed.xml';
-  $raw_path = $upload_dir['basedir'] . '/wp-sls/export.xml';
+  //$raw_path = $upload_dir['basedir'] . '/wp-sls/export.xml';
 
   
-  file_put_contents($save_path, $filtered_xml_string);
-  file_put_contents($raw_path, $raw_xml);
+  file_put_contents($save_path, $raw_xml);
+  //file_put_contents($raw_path, $raw_xml);
 
 }
 
