@@ -8,6 +8,7 @@ add_action( 'admin_init', 'register_sls_search_ext_settings' );
 function register_sls_search_ext_settings() {
   register_setting( 'wp-sls-search-settings-group', 'wp_sls_search_form' );
   register_setting( 'wp-sls-search-settings-group', 'wp_sls_search_form_input' );
+  register_setting( 'wp-sls-search-settings-group', 'wp_sls_search_post_type' );
 }
 
 /**
@@ -37,6 +38,13 @@ function wp_sls_search_options() { ?>
               <td>
                 <p>Search input field to display results while typing.</p>
                 <input placeholder="input[type=search]" name="wp_sls_search_form_input" type="text" aria-describedby="serverless-search-target-class" value="<?php echo get_option( 'wp_sls_search_form_input' ); ?>" class="regular-text code">
+              </td>
+            </tr>
+            <tr valign="top">
+              <th scope="row">Search Post types:</th>
+              <td>
+                <p>Type of posts to index. Accepts <a href="https://developer.wordpress.org/reference/functions/export_wp/#parameters" target="_blank">these possibilities</a>: 'all', 'post', 'page', 'attachment', or a defined custom post.</p>
+                <input placeholder="post" name="wp_sls_search_post_type" type="text" aria-describedby="serverless-search-target-class" value="<?php echo get_option( 'wp_sls_search_post_type' ); ?>" class="regular-text code">
               </td>
             </tr>
           </table>
