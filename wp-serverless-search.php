@@ -59,7 +59,7 @@ function create_search_feed()
   ob_start();
 
   $wpExportOptions = array(
-    'content'    => 'all',
+    'content'    => get_option('wp_sls_search_post_type'),
     'status'     => 'publish',
   );
   
