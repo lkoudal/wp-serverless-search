@@ -20,7 +20,7 @@ function wp_sls_search_install()
 {
   // trigger our function that registers the custom post type
   create_wp_sls_dir();
-  create_search_feed();
+  create_search_feed('','','');
 }
 
 add_action('init', 'create_wp_sls_dir');
@@ -48,10 +48,9 @@ function create_wp_sls_dir()
 //add_action('wp_loaded', 'create_search_feed');
 //add_action('publish_page', 'create_search_feed');
 //add_action('publish_post', 'create_search_feed');
-add_action('transition_post_status', 'create_search_feed', 10, 0);
+add_action('transition_post_status', 'create_search_feed', 10, 3);
 
-
-function create_search_feed()
+function create_search_feed($unused1, $unused2, $unused3)
 {
 
   require_once(ABSPATH . 'wp-admin/includes/export.php');
