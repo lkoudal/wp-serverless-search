@@ -147,7 +147,8 @@ function wp_sls_search_assets()
 
   $search_params = array(
     'searchForm' => get_option('wp_sls_search_form'),
-    'searchFormInput' => get_option('wp_sls_search_form_input')
+    'searchFormInput' => get_option('wp_sls_search_form_input'),
+    'uploadDir' => wp_get_upload_dir()['baseurl']
   );
 
   wp_register_script('wp-sls-search-js', $shifter_js, array('jquery', 'micromodal', 'fusejs'), null, true);
