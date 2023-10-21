@@ -64,7 +64,7 @@ function create_search_feed()
   }
 
   $wpExportOptions = array(
-    'content'    => $index_type,
+    'content'    => 'course',
     'status'     => 'publish',
   );
   
