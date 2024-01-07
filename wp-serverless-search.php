@@ -20,7 +20,7 @@ function wp_sls_search_install()
 {
   // trigger our function that registers the custom post type
   create_wp_sls_dir();
-  create_search_feed();
+  create_search_feed_modern();
 }
 
 add_action('init', 'create_wp_sls_dir');
@@ -46,54 +46,95 @@ function create_wp_sls_dir()
  * Create Search Feed
  */
 //add_action('wp_loaded', 'create_search_feed');
-//add_action('publish_page', 'create_search_feed');
-add_action('publish_post', 'create_search_feed');
+ add_action('publish_post', 'create_search_feed_modern');
 
 
-function create_search_feed()
+
+
+
+
+/**
+ * create_search_feed_modern.
+ *
+ * @author	Lars Koudal
+ * @since	v0.0.1
+ * @version	v1.0.0	Friday, January 5th, 2024.
+ * @global
+ * @return	void
+ */
+function create_search_feed_modern()
 {
-
-  require_once(ABSPATH . 'wp-admin/includes/export.php');
-
-  ob_start();
-
-  if (!get_option('wp_sls_search_post_type')) {
-    $index_type = 'post';
-  } else {
-    $index_type = get_option('wp_sls_search_post_type');
+  if (defined('WP_DEBUG') && WP_DEBUG) {
+    $start_time = microtime(true);
   }
 
-  $wpExportOptions = array(
-    'content'    => $index_type,
-    'status'     => 'publish',
-  );
-  
+  global $wpdb;
 
-  export_wp($wpExportOptions);
-  
+  $post_types = ['post', 'page', 'location'];
+  $post_types = "'" . implode("','", $post_types) . "'";
 
-  $raw_xml = ob_get_clean();
-  
-  //$parsed_xml = new SimpleXMLElement($raw_xml);
-  //$filtered_xml_object = $parsed_xml->xpath("/rss");
-  //$filtered_xml_string = $filtered_xml_object[0]->asXML();
+  $query = "
+    SELECT p.ID, p.post_title, p.post_excerpt, p.post_content, m.meta_value as formatted_address
+    FROM $wpdb->posts p
+    LEFT JOIN $wpdb->postmeta m ON p.ID = m.post_id AND m.meta_key = 'formatted_address'
+    WHERE p.post_status = 'publish' AND p.post_type IN ($post_types)
+  ";
+
+  $results = $wpdb->get_results($query);
 
   $upload_dir = wp_get_upload_dir();
-  //$save_path = $upload_dir['basedir'] . '/wp-sls/search-feed.xml';
-  $raw_path = $upload_dir['basedir'] . '/wp-sls/export.xml';
+  $raw_path = $upload_dir['basedir'] . '/wp-sls/export.json';
 
-  
-  //file_put_contents($save_path, $raw_xml);
-  file_put_contents($raw_path, $raw_xml);
+  $posts = [];
 
+  foreach ($results as $post) {
+    $post_data = [];
+    if (!empty($post->post_title)) {
+      $post_data['title'] = $post->post_title;
+    }
+    if (!empty($post->post_excerpt) || !empty($post->formatted_address)) {
+      $description = $post->post_excerpt;
+      if (!empty($post->formatted_address)) {
+        $description .= ' ' . $post->formatted_address;
+      }
+      $post_data['description'] = $description;
+    }
+    if (!empty(strip_tags($post->post_content))) {
+      $post_data['content'] = strip_tags($post->post_content);
+    }
+    if (!empty($post->ID)) {
+      $post_data['link'] = get_site_url() . '/?p=' . $post->ID;
+    }
+    if (!empty($post_data)) {
+      $posts[] = $post_data;
+    }
+  }
+
+  file_put_contents($raw_path, json_encode($posts));
+
+  if (defined('WP_DEBUG') && WP_DEBUG) {
+    $end_time = microtime(true);
+    $execution_time = $end_time - $start_time;
+    $execution_time_minutes = floor($execution_time / 60);
+    $execution_time_seconds = $execution_time % 60;
+    error_log("Execution time of create_search_feed_modern: $execution_time_minutes minute(s) $execution_time_seconds second(s)");
+  }
 }
+
+
+
 
 
 
 /**
  * Set Plugin Defaults
+ *
+ * @author	Lars Koudal
+ * @since	v0.0.1
+ * @version	v1.0.0	Friday, January 5th, 2024.
+ * @global
+ * @return	void
  */
-
 function wp_sls_search_default_options()
 {
   $options = array(
@@ -147,38 +188,31 @@ function wp_sls_search_assets()
     'uploadDir' => wp_get_upload_dir()['baseurl']
   );
 
-  wp_register_script('wp-sls-search-js', $shifter_js, array('jquery', 'micromodal', 'fusejs'), null, true);
+  wp_register_script('wp-sls-search-js', $shifter_js, array('jquery', 'fusejs'), null, true);
   wp_localize_script('wp-sls-search-js', 'searchParams', $search_params);
   wp_enqueue_script('wp-sls-search-js');
 
-  wp_register_script('fusejs', 'https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js', null, null, true);
+  wp_register_script('fusejs', 'https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.js', null, null, true);
   wp_enqueue_script('fusejs');
-
-  wp_register_script('micromodal', 'https://cdn.jsdelivr.net/npm/micromodal/dist/micromodal.min.js', null, null, true);
-  wp_enqueue_script('micromodal');
 
   wp_register_style("wp-sls-search-css", plugins_url('/main/main.css', __FILE__));
   wp_enqueue_style("wp-sls-search-css");
 }
 
-function wp_sls_search_modal()
-{ ?>
-  <div class="wp-sls-search-modal" id="wp-sls-search-modal" aria-hidden="true">
-    <div class="wp-sls-search-modal__overlay" tabindex="-1" data-micromodal-overlay>
-      <div class="wp-sls-search-modal__container" role="dialog" aria-labelledby="modal__title" aria-describedby="modal__content">
-        <header class="wp-sls-search-modal__header">
-          <a href="#" aria-label="Close modal" data-micromodal-close></a>
-        </header>
-        <form role="search" method="get" class="search-form">
-          <label for="wp-sls-earch-field">
-            <span class="screen-reader-text">Search for:</span>
-          </label>
-          <input id="wp-sls-earch-field" class="wp-sls-search-field" type="search" autocomplete="off" class="search-field" placeholder="Search …" value="" name="s">
-        </form>
-        <div role="document"></div>
-      </div>
-    </div>
-  </div>
-<?php }
+// create a function that replaces the default WordPress search box output
+function wp_sls_search_form($form)
+{
+  $form = '<form role="search" method="get" class="search-form">
+  <label for="wp-sls-earch-field">
+    <span class="screen-reader-text">Search for:</span>
+  </label>
+  <input id="wp-sls-earch-field" class="wp-sls-search-field" type="search" autocomplete="off" class="search-field" placeholder="Search …" value="" name="s">
+</form>
+<div role="document"></div>
+<div class="wp-sls-search-results"></div>';
+return $form;
+}
+// add the action that replaces the content of the default WordPress search form with our custom search wp_sls_search_form
+add_action('get_search_form', 'wp_sls_search_form',9999,1);
 
-add_action('wp_footer', 'wp_sls_search_modal');
+

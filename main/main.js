@@ -5,7 +5,7 @@
 
 
 var wpServerlessSearch = (function () {
-  const searchFeed = searchParams.uploadDir + '/wp-sls/export.xml';
+  const searchFeed = searchParams.uploadDir + '/wp-sls/export.json';
   const urlParams = window.location.search;
   const searchModalSelector = 'wp-sls-search-modal';
   const searchModalInput = '.wp-sls-search-field';
@@ -22,22 +22,13 @@ var wpServerlessSearch = (function () {
     });
   }
 
-  /**
-   * 
-   * Launch Search Modal
-   */
-  function launchSearchModal() {
-    MicroModal.show('wp-sls-search-modal');
-  }
 
   /**
    * 
    * @param {string} url - WordPress Post URL Pathname
    */
   function postUrl(url) {
-    var parser = document.createElement('a');
-    parser.href = url;
-    return parser.pathname;
+    return url;
   }
 
   /**
@@ -49,7 +40,7 @@ var wpServerlessSearch = (function () {
       return;
     }
 
-    launchSearchModal();
+searchPosts();
   }
 
   /**
@@ -95,8 +86,9 @@ var wpServerlessSearch = (function () {
     [].forEach.call(el, function (e) {
       e.addEventListener("submit", function (e) {
         e.preventDefault();
-        launchSearchModal();
-      });
+//        launchSearchModal();
+        console.log('search submit');
+});
     });
   }
 
@@ -105,40 +97,33 @@ var wpServerlessSearch = (function () {
     [].forEach.call(el, function (e) {
       e.addEventListener("input", function (e) {
         // fire on search input
+        console.log('Search input changed'); // Add your functionality here
+
       });
     });
   }
+  
+  // Uncomment the function call
+  onSearchInput();
 
   function searchPosts() {
     var search = null;
     jQuery.ajax(searchFeed, {
-      accepts: {
-        xml: "application/rss+xml"
-      },
-      dataType: "xml",
+      dataType: "json",
       success: function (data) {
-
         var searchArray = [];
 
-        var data = data.getElementsByTagName("channel")[0];
-
-        jQuery('.wp-sls-search-modal [role=document]').append('<div id="wp-sls-search-results" class="wp-sls-search-modal__results"></div>');
-
-        jQuery(data).find("item").each(function () {
-          var el = jQuery(this);
-
-          // Check for Title
-          if (!el.find("title").text()) {
+        data.forEach(function (item) {
+          if (!item.title) {
             return;
           }
-
+        
           searchArray.push({
-            "title": el.find('title').text(),
-            "description": el.find('excerpt\\:encoded').text(),
-            "content": el.find('content\\:encoded').text(),
-            "link": postUrl(el.find('link').text())
+            "title": item.title,
+            "description": item.description ? item.description : "",
+            "content": item.content,
+            "link": postUrl(item.link)
           });
-
         });
 
         var options = {
@@ -150,12 +135,9 @@ var wpServerlessSearch = (function () {
           minMatchCharLength: 1,
           keys: [{
             name: 'title',
-            weight: 0.75
-          }, {
-            name: 'description',
             weight: 0.5
           }, {
-            name: 'content',
+            name: 'description',
             weight: 0.5
           }]
         };
@@ -168,8 +150,10 @@ var wpServerlessSearch = (function () {
 
           jQuery(this).on('input', function () {
 
+            console.log('Search term: ', jQuery(this).val());
             var search = fuse.search(jQuery(this).val());
-            var $res = jQuery('#wp-sls-search-results');
+
+            var $res = jQuery('.wp-sls-search-results');
             $res.empty();
 
             if (jQuery(this).val().length < 1) return;
@@ -180,11 +164,11 @@ var wpServerlessSearch = (function () {
             }
 
             search.forEach(function (data) {
-
+  
               var postContentData = {
-                title: data.title,
-                excerpt: data.description ? data.description : data.content,
-                link: data.link
+                title: data.item.title,
+                excerpt: data.item.description,
+                link: data.item.link
               };
 
               $res.append(postContent(postContentData));
@@ -195,21 +179,22 @@ var wpServerlessSearch = (function () {
     });
   }
 
-  function postContent(
-    postContentData = {
-      title: '',
-      excerpt: '',
-      link: ''
-    }
-  ) {
-    return `<article>
-      <header class='entry-header'>
-        <h2 class='entry-title'><a href='` + postContentData.link + `' rel='bookmark'>` + postContentData.title + `</a></h2>
-      </header>
-    </article>`;
-  }
 
-  // onSearchInput();
+
+
+  
+    function postContent(post) {
+
+      return `
+        <article>
+          <header>
+            <h4><a href='${post.link}' rel='bookmark'>${post.title}</a></h4>
+            ${post.excerpt ? `<p>${post.excerpt}</p>` : ''}
+          </header>
+        </article>`;
+    }
+
+   onSearchInput();
   searchPosts();
   onSearchSubmit();
   addQueryToSearchModal();
