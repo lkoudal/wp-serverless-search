@@ -13,8 +13,12 @@ var wpServerlessSearch = (function () {
   const searchFormInput = searchParams.searchFormInput;
 
   /**
-   * 
    * Sync search input with search modal
+   *
+   * @author	Lars Koudal
+   * @since	v0.0.1
+   * @version	v1.0.0	Sunday, January 7th, 2024.
+   * @return	void
    */
   function syncSearchFields() {
     jQuery(searchFormInput).keyup(function () {
@@ -24,16 +28,25 @@ var wpServerlessSearch = (function () {
 
 
   /**
-   * 
-   * @param {string} url - WordPress Post URL Pathname
+   * postUrl.
+   *
+   * @author	Lars Koudal
+   * @since	v0.0.1
+   * @version	v1.0.0	Sunday, January 7th, 2024.
+   * @param	mixed	url	
+   * @return	mixed
    */
   function postUrl(url) {
     return url;
   }
 
   /**
-   * 
    * Test for search query based on URL
+   *
+   * @author	Lars Koudal
+   * @since	v0.0.1
+   * @version	v1.0.0	Sunday, January 7th, 2024.
+   * @return	void
    */
   function urlQuery() {
     if (!searchQueryParams()) {
@@ -44,8 +57,12 @@ searchPosts();
   }
 
   /**
-   * 
-   * @param {string} query - Add query to search modal
+   * addQueryToSearchModal.
+   *
+   * @author	Lars Koudal
+   * @since	v0.0.1
+   * @version	v1.0.0	Sunday, January 7th, 2024.
+   * @return	void
    */
   function addQueryToSearchModal() {
     if (!searchQueryParams()) {
@@ -59,8 +76,13 @@ searchPosts();
   }
 
   /**
-   * 
-   * @param {string} url - Parse search query paramaters from URL
+   * searchQueryParams.
+   *
+   * @author	Lars Koudal
+   * @since	v0.0.1
+   * @version	v1.0.0	Sunday, January 7th, 2024.
+   * @param	mixed	url	Default: urlParams
+   * @return	mixed
    */
   function searchQueryParams(url = urlParams) {
     url = url.split('+').join(' ');
@@ -76,11 +98,15 @@ searchPosts();
     return params.s;
   }
 
-  /**
-   * 
-   * Search submit
-   */
 
+  /**
+   * onSearchSubmit.
+   *
+   * @author	Lars Koudal
+   * @since	v0.0.1
+   * @version	v1.0.0	Sunday, January 7th, 2024.
+   * @return	void
+   */
   function onSearchSubmit() {
     var el = document.querySelectorAll(searchForm);
     [].forEach.call(el, function (e) {
@@ -92,6 +118,14 @@ searchPosts();
     });
   }
 
+  /**
+   * onSearchInput.
+   *
+   * @author	Lars Koudal
+   * @since	v0.0.1
+   * @version	v1.0.0	Sunday, January 7th, 2024.
+   * @return	void
+   */
   function onSearchInput() {
     var el = document.querySelectorAll(searchForm);
     [].forEach.call(el, function (e) {
@@ -103,86 +137,98 @@ searchPosts();
     });
   }
   
-  // Uncomment the function call
-  onSearchInput();
 
-  function searchPosts() {
-    var search = null;
-    jQuery.ajax(searchFeed, {
-      dataType: "json",
-      success: function (data) {
-        var searchArray = [];
+/**
+ * @var		async	functio
+ * @global
+ */
+async function searchPosts() {
+  var search = null;
+  var data = await jQuery.ajax(searchFeed, {
+    dataType: "json"
+  });
 
-        data.forEach(function (item) {
-          if (!item.title) {
-            return;
-          }
-        
-          searchArray.push({
-            "title": item.title,
-            "description": item.description ? item.description : "",
-            "content": item.content,
-            "link": postUrl(item.link)
-          });
-        });
+  var searchArray = [];
 
-        var options = {
-          shouldSort: true,
-          threshold: 0.6,
-          location: 0,
-          distance: 100,
-          maxPatternLength: 32,
-          minMatchCharLength: 1,
-          keys: [{
-            name: 'title',
-            weight: 0.5
-          }, {
-            name: 'description',
-            weight: 0.5
-          }]
+  data.forEach(function (item) {
+    if (!item.title) {
+      return;
+    }
+
+    searchArray.push({
+      "title": item.title,
+      "description": item.description ? item.description : "",
+      "content": item.content,
+      "link": postUrl(item.link)
+    });
+  });
+
+  var searchOptions = {
+    shouldSort: true,
+    threshold: 0.1,
+    location: 0,
+    distance: 100,
+    maxPatternLength: 32,
+    minMatchCharLength: 1,
+    keys: [{
+      name: 'title',
+      weight: 0.5
+    }, {
+      name: 'description',
+      weight: 0.5
+    }]
+  };
+
+  var fuse = new Fuse(searchArray, searchOptions);
+
+  var $searchInput = jQuery(searchParams.searchFormInput);
+
+  $searchInput.each(function () {
+
+    jQuery(this).on('input', async function () {
+
+      console.log('Search term: ', jQuery(this).val());
+      var search = fuse.search(jQuery(this).val(), searchOptions);
+
+      // Limit the number of results displayed
+      search = search.slice(0, 20);
+
+      // Get the results container relative to the current input field
+      var $res = jQuery(this).siblings('.wp-sls-search-results');
+      $res.empty();
+
+      if (jQuery(this).val().length < 1) return;
+      if (search[0] === undefined) {
+        $res.append('<h5>No results</h5>');
+      } else {
+        $res.append('<h5>' + search.length + ' results:</h5>');
+      }
+
+      search.forEach(function (data) {
+
+        var postContentData = {
+          title: data.item.title,
+          excerpt: data.item.description,
+          link: data.item.link
         };
 
-        var fuse = new Fuse(searchArray, options);
-
-        var $searchInput = jQuery(searchParams.searchFormInput);
-
-        $searchInput.each(function () {
-
-          jQuery(this).on('input', function () {
-
-            console.log('Search term: ', jQuery(this).val());
-            var search = fuse.search(jQuery(this).val());
-
-            var $res = jQuery('.wp-sls-search-results');
-            $res.empty();
-
-            if (jQuery(this).val().length < 1) return;
-            if (search[0] === undefined) {
-              $res.append('<h5>No results</h5>');
-            } else {
-              $res.append('<h5>' + search.length + ' results:</h5>');
-            }
-
-            search.forEach(function (data) {
-  
-              var postContentData = {
-                title: data.item.title,
-                excerpt: data.item.description,
-                link: data.item.link
-              };
-
-              $res.append(postContent(postContentData));
-            });
-          });
-        });
-      }
+        $res.append(postContent(postContentData));
+      });
     });
-  }
-
-
+  });
+}
 
 
   
+    /**
+     * postContent.
+     *
+     * @author	Lars Koudal
+     * @since	v0.0.1
+     * @version	v1.0.0	Sunday, January 7th, 2024.
+     * @param	mixed	post	
+     * @return	void
+     */
     function postContent(post) {
 
       return `
@@ -194,7 +240,9 @@ searchPosts();
         </article>`;
     }
 
-   onSearchInput();
+      // Uncomment the function call
+
+  onSearchInput();
   searchPosts();
   onSearchSubmit();
   addQueryToSearchModal();

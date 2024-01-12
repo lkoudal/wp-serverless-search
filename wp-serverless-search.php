@@ -103,7 +103,8 @@ function create_search_feed_modern()
       $post_data['content'] = strip_tags($post->post_content);
     }
     if (!empty($post->ID)) {
-      $post_data['link'] = get_site_url() . '/?p=' . $post->ID;
+      $post_data['link'] = str_replace('dirtyfl.local', 'dirtyfl.com', get_permalink($post->ID));
+
     }
     if (!empty($post_data)) {
       $posts[] = $post_data;
